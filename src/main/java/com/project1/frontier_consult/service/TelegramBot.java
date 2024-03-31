@@ -3,12 +3,14 @@ package com.project1.frontier_consult.service;
 import com.project1.frontier_consult.config.BotConfig;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Slf4j
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
@@ -151,7 +153,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(message);
         } catch (TelegramApiException e) {
-
+            log.error("Error occurred: " + e.getMessage());
         }
     }
 
@@ -162,6 +164,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/eng - for english language;\n" +
                 "/ro - pentru limba română;\n" +
                 "/ru - для русского языка.";
+
+        log.info("Replied to user {}", name);
 
         sendMessage(chatId, answer);
     }
