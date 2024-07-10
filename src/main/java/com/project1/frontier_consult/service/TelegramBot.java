@@ -123,6 +123,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                     myDataCommandReceived(chatId, name, id);
                     break;
 
+                case "/community":
+                    communityCommandReceived(chatId);
+                    break;
+
                 default:
                     defaultCommandReceived(chatId);
             }
@@ -184,7 +188,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private void startCommandReceived(long chatId, String name) {
         String answer = "Hi, " + name + ", nice to meet you!\n\n" +
-                "I was created to consult you about moldovan border crossing regulations!\n\n" +
+                "I was created to consult you about border crossing regulations in the Republic of Moldova!\n\n" +
                 "You can choose the language to continue our conversation:\n\n" +
                 "/eng - for english language;\n" +
                 "/ro - pentru limba română;\n" +
@@ -214,7 +218,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/validity - check validity of your vehicle's document\n\n" +
                 "**Personal data**\n" +
                 "/myData - personal info\n" +
-                "/language - change the language";
+                "/language - change the language\n" +
+                "/community - how many of us are here";
 
         String answerRo = "Noroc, am fost creat pentru oferirea consultațiilor privind regulile de trecere a frontierei RM!\n" +
                 "Ce informații doriți să consultați?\n\n" +
@@ -234,7 +239,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/validity - verifică valabilitate unui document pentru vehiculul\n\n" +
                 "**Datele personale**\n" +
                 "/myData - informația persoanlă\n" +
-                "/language - schimbă limba";
+                "/language - schimbă limba" +
+                "/community - cîți suntem noi aici";
 
         String answerRu = "Привет! Я был создан для предоставления консультаций о правилах пересечения границы Республики Молдова!\n" +
                 "О чем бы вы хотели узнать?\n\n" +
@@ -254,7 +260,21 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/validity - проверь действительность своих проездных документов\n\n" +
                 "**Личные данные**\n" +
                 "/myData - личная информация\n" +
-                "/language - поменять язык";
+                "/language - поменять язык" +
+                "/community - сколько нас здесь";
+
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+    }
+
+    private void communityCommandReceived(long chatId) {
+
+        long number = userRepository.count();
+
+        String answerEng = "At that moment, our community has " + number + " participants!";
+
+        String answerRo = "La momentul actual, comunitatea noastră are " + number + " participanți!";
+
+        String answerRu = "На данный момент в нашем сообществе " + number + " участников!";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
