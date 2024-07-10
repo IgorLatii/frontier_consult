@@ -167,13 +167,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 "/main - вернуться в главное меню";
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void sendMessage(long chatId, String textToSend) {
@@ -196,9 +190,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/ro - pentru limba română;\n" +
                 "/ru - для русского языка.";
 
-        log.info("Replied to user {}", name);
-
         sendMessage(chatId, answer);
+        log.info("Replied to user {}", name);
     }
 
 
@@ -242,7 +235,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "**Datele personale**\n" +
                 "/myData - informația persoanlă\n" +
                 "/language - schimbă limba";
-        ;
 
         String answerRu = "Привет! Я был создан для предоставления консультаций о правилах пересечения границы Республики Молдова!\n" +
                 "О чем бы вы хотели узнать?\n\n" +
@@ -263,15 +255,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "**Личные данные**\n" +
                 "/myData - личная информация\n" +
                 "/language - поменять язык";
-        ;
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void foreignersCommandReceived(long chatId) {
@@ -332,13 +317,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для иностранных транспортных средств\n" +
                 "/main - вернуться обратно в основное меню";
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void citizensCommandReceived(long chatId) {
@@ -395,13 +374,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств из РМ\n" +
                 "/back - вернуться обратно в основное меню";
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void purposeDocsCommandReceived(long chatId) {
@@ -489,13 +462,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для иностранных транспортных средств\n" +
                 "/main - вернуться обратно в основное меню";
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void validityCommandReceived(long chatId) {
@@ -527,13 +494,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
 
@@ -568,13 +529,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств из РМ\n" +
                 "/main - вернуться в главное меню";
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void acceptedDocsCommandReceived(long chatId) {
@@ -608,13 +563,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void assuranceCommandReceived(long chatId) {
@@ -649,13 +598,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void vinietaCommandReceived(long chatId) {
@@ -686,13 +629,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        if (getFlag() == 2) {
-            sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
-            sendMessage(chatId, answerRu);
-        } else {
-            sendMessage(chatId, answerEng);
-        }
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void defaultCommandReceived(long chatId) {
@@ -720,9 +657,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 "/main - back to main menu";
 
-        if (getFlag() == 2) {
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+    }
+
+    private void chooseAnswerLanguage(long chatId, String answerRo, String answerRu, String answerEng){
+        if (flag == 2) {
             sendMessage(chatId, answerRo);
-        } else if (getFlag() == 3) {
+        } else if (flag == 3) {
             sendMessage(chatId, answerRu);
         } else {
             sendMessage(chatId, answerEng);
