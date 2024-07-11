@@ -104,7 +104,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     break;
 
                 case "/calculator":
-                    defaultCommandReceived(chatId);
+                    calculatorCommandReceived(chatId);
                     break;
 
                 case "/vehicles":
@@ -127,10 +127,38 @@ public class TelegramBot extends TelegramLongPollingBot {
                     communityCommandReceived(chatId);
                     break;
 
+                case "/contacts":
+                    contactsCommandReceived(chatId);
+                    break;
+
                 default:
                     defaultCommandReceived(chatId);
             }
         }
+    }
+
+    private void contactsCommandReceived(long chatId) {
+        String answerEng = "We are glad that you are with us!!! " +
+                "You can send any questions, clarifications, or need for additional consultations " +
+                "to our email.: \nfrontier.consult@yahoo.com \n" +
+                "Thanks!!! Go on!!!\n\n" +
+
+                "/main - back to main menu";
+
+        String answerRo = "Ne bucurăm că ești alături de noi!!! Orice întrebări, clarificări sau nevoie de consultații " +
+                "suplimentare, le puteți trimite la adresa electronica: \nfrontier.consult@yahoo.com\n" +
+                "Mulțumesc!!! Continuați!!!\n\n" +
+
+                "/main - înapoi la meniul principal";
+
+        String answerRu = "Мы рады тому, что вы с нами!!!\n" +
+                "Любые вопросы, уточнения, необходимость в дополнительных консюльтациях вы можете отправлять " +
+                "письмом на наш email: \nfrontier.consult@yahoo.com\n" +
+                "Спасибо!!! Продолжайте!!!\n\n" +
+
+                "/main - в главное меню";
+
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void registerUser(Message msg) {
@@ -152,23 +180,19 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void myDataCommandReceived(long chatId, String name, long id) {
-
         String answerEng = "Your Chat ID is: " + chatId + "\n" +
                 "Your Telegram ID is: " + id + "\n" +
                 "Your Telegram Name is: " + name + "\n\n" +
-
                 "/main - back to main menu";
 
         String answerRo = "Your Chat ID is: " + chatId + "\n" +
                 "Your Telegram ID is: " + id + "\n" +
                 "Your Telegram Name is: " + name + "\n\n" +
-
                 "/main - înapoi la meniul principal";
 
         String answerRu = "Ваш Chat ID: " + chatId + "\n" +
                 "Ваш Telegram ID: " + id + "\n" +
                 "Ваше Telegram имя: " + name + "\n\n" +
-
                 "/main - вернуться в главное меню";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
@@ -216,10 +240,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/assurance - how to buy an assurance\n" +
                 "/vinieta - how to pay a road toll\n" +
                 "/validity - check validity of your vehicle's document\n\n" +
-                "**Personal data**\n" +
+                "**Other data**\n" +
                 "/myData - personal info\n" +
                 "/language - change the language\n" +
-                "/community - how many of us are here";
+                "/community - how many of us are here\n" +
+                "/contacts - how to contact us";
 
         String answerRo = "Noroc, am fost creat pentru oferirea consultațiilor privind regulile de trecere a frontierei RM!\n" +
                 "Ce informații doriți să consultați?\n\n" +
@@ -237,10 +262,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/assurance - cum de procurat o asigurare\n" +
                 "/vinieta - cum de achitat vinieta\n" +
                 "/validity - verifică valabilitate unui document pentru vehiculul\n\n" +
-                "**Datele personale**\n" +
+                "**Alte date**\n" +
                 "/myData - informația personală\n" +
                 "/language - schimbă limba\n" +
-                "/community - cîți suntem noi aici";
+                "/community - cîți suntem noi aici\n" +
+                "/contacts - cum să ne contactați";
 
         String answerRu = "Привет! Я был создан для предоставления консультаций о правилах пересечения границы Республики Молдова!\n" +
                 "О чем бы вы хотели узнать?\n\n" +
@@ -258,25 +284,59 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/assurance - как преобрести страховку\n" +
                 "/vinieta - как оплатить виньетку\n" +
                 "/validity - проверь действительность своих проездных документов\n\n" +
-                "**Личные данные**\n" +
+                "**Другие данные**\n" +
                 "/myData - личная информация\n" +
                 "/language - поменять язык\n" +
-                "/community - сколько нас здесь";
+                "/community - сколько нас здесь\n" +
+                "/contacts - как с нами связаться";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
     private void communityCommandReceived(long chatId) {
-
         long number = userRepository.count();
-
         String answerEng = "At that moment, our community has " + number + " participants!\n\n" +
                 "/main - back to main menu";
-
         String answerRo = "La momentul actual, comunitatea noastră are " + number + " participanți!\n\n" +
                 "/main - înapoi la meniul principal";
-
         String answerRu = "На данный момент в нашем сообществе " + number + " участников!\n\n" +
+                "/main - вернуться в главное меню";
+
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+    }
+
+    private void calculatorCommandReceived(long chatId){
+        String answerEng = "For calculation the period of staying of the foreign citizens in the " +
+                "Republic of Moldova you can consult the official Schengen calculator following link:\n" +
+                "https://ec.europa.eu/assets/home/visa-calculator/calculator.htm?lang=en\n\n" +
+
+                "/citizens - regulations on Republic of Moldova citizens\n" +
+                "/foreigners - regulations on foreign citizens\n" +
+                "/vehicles - border crossing rules for vehicles\n" +
+                "/main - back to main menu";
+
+        String answerRo = "Conform prevederilor art.84 alin.(3) al Legii nr.200/2010 privind regimul străinilor în Republica Moldova, " +
+                "Străinii se pot afla pe teritoriul RM până la 90 de zile calendaristice în decursul oricărei perioade de 180 de zile " +
+                "calendaristice, ceea ce implică luarea în considerare a ultimei perioade de 180 de zile precedente fiecărei zile de ședere.\n\n" +
+                "Pentru calcularea termenului de ședere a cetățenilor străini în Republica Moldova " +
+                "puteți folosi Calculatorul Schengen accesînd următorul link:\n" +
+                "https://ec.europa.eu/assets/home/visa-calculator/calculator.htm?lang=en\n\n" +
+
+                "/citizens - regulile de trecere a cetățenilor RM\n" +
+                "/foreigners - regulile de trecere a străinilor\n" +
+                "/vehicles - regulile de trecere a vehiculelor\n" +
+                "/back - înapoi la meniul principal";
+
+        String answerRu = "В соответствии с положениями ст.84 пкт.(3) Законв №200/2010 о режиме иностранцев в Республике Модова, " +
+                "Иностранцы могут находиться на территории РМ не более 90 календарных дней в течение любого периода в 180 календарных дней, " +
+                "что предполагает учет последнего 180-дневного периода, предшествующего каждому дню пребывания.\n\n" +
+                "Для подсчета сроков пребывания иностранцев на территрии РМ, можете воспользоваться " +
+                "Официальным Шенгенским Калькулятором, пройдя по следующей ссылке:\n" +
+                "https://ec.europa.eu/assets/home/visa-calculator/calculator.htm?lang=en\n\n" +
+
+                "/citizens - правила пересечения граждан РМ\n" +
+                "/foreigners - правила пересечение для иностранцев\n" +
+                "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
@@ -658,7 +718,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void defaultCommandReceived(long chatId) {
         String answerEng = "Sorry, the command is not implemented at that moment..\n" +
                 "Please choose other proposed command!\n\n" +
-                "Or white us an email: latean@mail.ru " +
+                "Or white us an email on: \nfrontier.consult@yahoo.com \n" +
                 "about your opinion / proposal / necessity we should implement!\n" +
                 "Thanks!!! Go on!!!\n\n" +
 
@@ -666,7 +726,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String answerRo = "Cerem scuze comanda nu este implementată la moment..\n" +
                 "Vă rog alegeți altă comandă propusă\n\n" +
-                "Sau scrieți un mesaj pe adresa electronică: latean@mail.ru\n" +
+                "Sau scrieți un mesaj pe adresa electronică: \nfrontier.consult@yahoo.com\n" +
                 "despre opinia / propunerea / necesarul care noi trebuie să implementăm!\n" +
                 "Mulțumesc!!! Continuați!!!\n\n" +
 
@@ -674,7 +734,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String answerRu = "Простите, данная команда не реализована на данный момент..\n" +
                 "Пожалуйста выберете другую предложенную команду!\n" +
-                "Или напишите письмо на наш email: latean@mail.ru\n" +
+                "Или напишите письмо на наш email: \nfrontier.consult@yahoo.com\n" +
                 "о вашем мнении / предложении / необходимости которую мы должны реализовать!\n" +
                 "Спасибо!!! Продолжайте!!!\n\n" +
 
