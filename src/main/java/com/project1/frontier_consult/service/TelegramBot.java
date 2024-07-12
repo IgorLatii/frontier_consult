@@ -108,7 +108,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     break;
 
                 case "/vehicles":
-                    defaultCommandReceived(chatId);
+                    vehiclesCommandReceived(chatId);
                     break;
 
                 case "/assurance":
@@ -227,7 +227,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         String answerEng = "So let's go!!! " +
                 "What border crossing information do you need to consult?\n\n" +
                 "You can control me by sending these commands:\n\n" +
-                "**Persons**\n" +
+                "**PERSONS**\n" +
                 "/citizens - regulations on Republic of Moldova citizens\n" +
                 "/validity - check validity of your travel document\n" +
                 "/foreigners - regulations on foreign citizens\n" +
@@ -235,12 +235,12 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/visas - who is requiring a visa for RM\n" +
                 "/acceptedDocs - accepted list of travel documents for RM\n" +
                 "/calculator - calculates period of staying\n\n" +
-                "**Vehicles**\n" +
+                "**VEHICLES**\n" +
                 "/vehicles - border crossing rules for means of transport\n" +
                 "/assurance - how to buy an assurance\n" +
                 "/vinieta - how to pay a road toll\n" +
                 "/validity - check validity of your vehicle's document\n\n" +
-                "**Other data**\n" +
+                "**OTHER DATA**\n" +
                 "/myData - personal info\n" +
                 "/language - change the language\n" +
                 "/community - how many of us are here\n" +
@@ -249,7 +249,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         String answerRo = "Noroc, am fost creat pentru oferirea consultațiilor privind regulile de trecere a frontierei RM!\n" +
                 "Ce informații doriți să consultați?\n\n" +
                 "Vă rog să alegeți:\n\n" +
-                "**Persoane**\n" +
+                "**PERSOANE**\n" +
                 "/citizens - regulile de trecere a cetățenilor RM\n" +
                 "/validity - verifică valabilitate documentului de călătorie\n" +
                 "/foreigners - regulile de trecere a străinilor\n" +
@@ -257,12 +257,12 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/visas - cine are nevoie de o viză pentru RM\n" +
                 "/acceptedDocs - lista acctelor de călătorie acceptate pentru RM\n" +
                 "/calculator - calcularea termenului de ședere\n\n" +
-                "**Vehicule**\n" +
+                "**VEHICULE**\n" +
                 "/vehicles - regulile de trecere a mijloacelor de transport\n" +
                 "/assurance - cum de procurat o asigurare\n" +
                 "/vinieta - cum de achitat vinieta\n" +
                 "/validity - verifică valabilitate unui document pentru vehiculul\n\n" +
-                "**Alte date**\n" +
+                "**ALTE DATE**\n" +
                 "/myData - informația personală\n" +
                 "/language - schimbă limba\n" +
                 "/community - cîți suntem noi aici\n" +
@@ -271,7 +271,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         String answerRu = "Привет! Я был создан для предоставления консультаций о правилах пересечения границы Республики Молдова!\n" +
                 "О чем бы вы хотели узнать?\n\n" +
                 "Пожалуйста выберите:\n\n" +
-                "**Лица**\n" +
+                "**ЛИЦА**\n" +
                 "/citizens - правила пересечения граждан РМ\n" +
                 "/validity - проверь действительность проезного документа\n" +
                 "/foreigners - правила пересечение для иностранцев\n" +
@@ -279,12 +279,12 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/visas - кому требуется виза для въезда в РМ\n" +
                 "/acceptedDocs - список признаваемых проездных документов для РМ\n" +
                 "/calculator - калькулятор сроков пребывания\n\n" +
-                "**Транспортные средства**\n" +
+                "**ТРАНСПОРТ**\n" +
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/assurance - как преобрести страховку\n" +
                 "/vinieta - как оплатить виньетку\n" +
                 "/validity - проверь действительность своих проездных документов\n\n" +
-                "**Другие данные**\n" +
+                "**ДРУГОЕ**\n" +
                 "/myData - личная информация\n" +
                 "/language - поменять язык\n" +
                 "/community - сколько нас здесь\n" +
@@ -337,6 +337,53 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/citizens - правила пересечения граждан РМ\n" +
                 "/foreigners - правила пересечение для иностранцев\n" +
                 "/vehicles - правила пересечения для транспортных средств\n" +
+                "/main - вернуться в главное меню";
+
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+    }
+
+
+    private void vehiclesCommandReceived(long chatId) {
+        String answerEng = "Documents that are requested from the driver during crossing the border:\n\n" +
+                "1) Driver's license valid for the category to which the driven vehicle belongs;\n" +
+                "2) Vehicle registration certificate;\n" +
+                "4) Documents relating to the nature and mass of the cargo, in the cases established by the legislation \n" +
+                "5) Vehicles insurance valid for the Republic of Moldova or abroad, depending on the circumstances;\n" +
+                "6) Authorization for the passengers transportation (regular or occasional services), in case of foreign transport operators;\n" +
+                "7) Confirmation that attesting the payment of the vignette for the period of stay in the Republic of Moldova for vehicles " +
+                "registered outside the Republic of Moldova, on exiting the country.\n\n" +
+
+                "/assurance - how to buy an assurance\n" +
+                "/vinieta - how to pay a road toll\n" +
+                "/validity - check validity of your vehicle's document\n\n" +
+                "/main - back to main menu";
+
+        String answerRo = "Documente solicitate la traversarea frontierei de la conducătorul mijlocului de transport sunt următoarele:\n\n" +
+                "1) Permisul de conducere valabil pentru categoria din care face parte vehiculul condus; \n" +
+                "2) Certificatul de înmatriculare a vehiculului; \n" +
+                "3) Actul care confirmă transmiterea în folosință a vehiculului, în cazul mijlocului de transport transmis în folosință având numărul de înmatriculare neutru; \n" +
+                "4) Actele referitoare la natura și masa încărcăturii, în cazurile stabilite de legislație; \n" +
+                "5) Asigurarea obligatorie de răspundere civilă auto valabilă pentru Republica Moldova sau pentru străinătate, după caz; \n" +
+                "6) Autorizația de transport rutier de persoane prin servicii regulate sau ocazionale, în cazul operatorilor de transport străini; \n" +
+                "7) Confirmarea ce atestă achitarea vinietei pentru perioada de aflare în Republica Moldova pentru vehicule înmatriculate în afară RM, la ieșire din țară.\n\n" +
+
+                "/assurance - cum de procurat o asigurare\n" +
+                "/vinieta - cum de achitat vinieta\n" +
+                "/validity - verifică valabilitate unui document pentru vehiculul\n\n" +
+                "/main - înapoi la meniul principal";
+
+        String answerRu = "Документами, запрашиваемыми у водителя транспортного средства при пересечении границы, являются:\n" +
+                "1) Водительское удостоверение, действительное для категории, к которой принадлежит управляемое транспортное средство;\n" +
+                "2) Свидетельство о регистрации транспортного средства;\n" +
+                "3) Акт, подтверждающий передачу транспортного средства в пользование, в случае, если транспортное средство, передаваемое в пользование, имеет нейтральный регистрационный номер;\n" +
+                "4) Документы, касающиеся характера и массы груза, в случаях, установленных законодательством;\n" +
+                "5) Обязательное страхование автогражданской ответственности, действительное на территории Республики Молдова или за рубежом, в зависимости от обстоятельств;\n" +
+                "6) Разрешение на автомобильные перевозки людей регулярными или нерегулярными рейсами в случае транспортных операторов;\n" +
+                "7) Подтверждение оплаты виньетки на период пребывания в Республике Молдова для транспортных средств, зарегистрированных за пределами Республики Молдова, при выезде из страны.\n\n" +
+
+                "/assurance - как преобрести страховку\n" +
+                "/vinieta - как оплатить виньетку\n" +
+                "/validity - проверь действительность своих проездных документов\n" +
                 "/main - вернуться в главное меню";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
