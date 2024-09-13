@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -26,6 +27,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Setter
     @Getter
     private int flag;
+    @Value("${owner.chatId}")
+    private long ownerChatId;
 
     public TelegramBot(BotConfig config) {
         this.config = config;
@@ -119,12 +122,12 @@ public class TelegramBot extends TelegramLongPollingBot {
                     vinietaCommandReceived(chatId);
                     break;
 
-                case "/myData":
-                    myDataCommandReceived(chatId, name, id);
+                case "/permis":
+                    permisCommandReceived(chatId, name, id);
                     break;
 
-                case "/community":
-                    communityCommandReceived(chatId);
+                case "/crossings":
+                    crossingsCommandReceived(chatId);
                     break;
 
                 case "/contacts":
@@ -140,20 +143,23 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void contactsCommandReceived(long chatId) {
         String answerEng = "We are glad that you are with us!!! " +
                 "You can send any questions, clarifications, or need for additional consultations " +
-                "to our email.: \nfrontier.consult@yahoo.com \n" +
+                "to our email.: \npolitia.frontiera@border.gov.md\n" +
+                "or you can contact us! Border Police Green Line: +37322259717\n” + " +
                 "Thanks!!! Go on!!!\n\n" +
 
                 "/main - back to main menu";
 
-        String answerRo = "Ne bucurăm că ești alături de noi!!! Orice întrebări, clarificări sau nevoie de consultații " +
-                "suplimentare, le puteți trimite la adresa electronica: \nfrontier.consult@yahoo.com\n" +
+        String answerRo = "Ne bucurăm că ești alături de noi!!! Orice întrebare, clarificare sau nevoie de consultații " +
+                "suplimentare, le puteți trimite la adresa electronica: \npolitia.frontiera@border.gov.md\n" +
+                "sau puteți să contactați Linia Verde a Poliției de Frontieră la numărul de telefon : +37322259717\n" +
                 "Mulțumesc!!! Continuați!!!\n\n" +
 
                 "/main - înapoi la meniul principal";
 
         String answerRu = "Мы рады тому, что вы с нами!!!\n" +
-                "Любые вопросы, уточнения, необходимость в дополнительных консюльтациях вы можете отправлять " +
-                "письмом на наш email: \nfrontier.consult@yahoo.com\n" +
+                "Любые вопросы, уточнения, необходимость в дополнительных консультациях вы можете отправлять " +
+                "письмом на наш email: \npolitia.frontiera@border.gov.md\n" +
+                "либо позвонив на Зеленую линию Пограничной Полиции по номеру телефона: +37322259717\n" +
                 "Спасибо!!! Продолжайте!!!\n\n" +
 
                 "/main - в главное меню";
@@ -175,11 +181,16 @@ public class TelegramBot extends TelegramLongPollingBot {
             user.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
 
             userRepository.save(user);
+
+            String infoMessage = "Registered user: " + user + " from " + chat.getLocation().toString() + "!\n" +
+                    "At that moment, our community has " + userRepository.count() + " participants!";
+
+            sendMessage(ownerChatId, infoMessage);
             log.info("Registered user: " + user);
         }
     }
 
-    private void myDataCommandReceived(long chatId, String name, long id) {
+    /*private void myDataCommandReceived(long chatId, String name, long id) {
         String answerEng = "Your Chat ID is: " + chatId + "\n" +
                 "Your Telegram ID is: " + id + "\n" +
                 "Your Telegram Name is: " + name + "\n\n" +
@@ -196,7 +207,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/main - вернуться в главное меню";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
-    }
+    }*/
 
     private void sendMessage(long chatId, String textToSend) {
         SendMessage message = new SendMessage();
@@ -222,7 +233,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         log.info("Replied to user {}", name);
     }
 
-
     private void languageCommandReceived(long chatId) {
         String answerEng = "So let's go!!! " +
                 "What border crossing information do you need to consult?\n\n" +
@@ -234,16 +244,17 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/purposeDocs - what are purpose of entry documents\n" +
                 "/visas - who is requiring a visa for RM\n" +
                 "/acceptedDocs - accepted list of travel documents for RM\n" +
-                "/calculator - calculates period of staying\n\n" +
+                "/calculator - calculates period of staying\n" +
+                "/crossings – obtain the information about your border crossings\n" +
+                "/permis – obtain the electronic permit of access to the border area\n\n" +
                 "**VEHICLES**\n" +
                 "/vehicles - border crossing rules for means of transport\n" +
                 "/assurance - how to buy an assurance\n" +
                 "/vinieta - how to pay a road toll\n" +
-                "/validity - check validity of your vehicle's document\n\n" +
+                "/validity - check validity of your vehicle's document\n" +
+                "/crossings – obtain the information about your vehicle border crossings\n\n" +
                 "**OTHER DATA**\n" +
-                "/myData - personal info\n" +
                 "/language - change the language\n" +
-                "/community - how many of us are here\n" +
                 "/contacts - how to contact us";
 
         String answerRo = "Noroc, am fost creat pentru oferirea consultațiilor privind regulile de trecere a frontierei RM!\n" +
@@ -253,19 +264,20 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/citizens - regulile de trecere a cetățenilor RM\n" +
                 "/validity - verifică valabilitate documentului de călătorie\n" +
                 "/foreigners - regulile de trecere a străinilor\n" +
-                "/purposeDocs - documente pentru agrumentarea scopului călătoriei\n" +
+                "/purposeDocs - documente pentru argumentarea scopului călătoriei\n" +
                 "/visas - cine are nevoie de o viză pentru RM\n" +
-                "/acceptedDocs - lista acctelor de călătorie acceptate pentru RM\n" +
-                "/calculator - calcularea termenului de ședere\n\n" +
+                "/acceptedDocs - lista actelor de călătorie acceptate pentru RM\n" +
+                "/calculator - calcularea termenului de ședere\n" +
+                "/crossings – obține informația privind traversarea frontierei\n\n" +
+                "/permis – obține permisul electronic de acces în zona de frontieră\n\n" +
                 "**VEHICULE**\n" +
                 "/vehicles - regulile de trecere a mijloacelor de transport\n" +
                 "/assurance - cum de procurat o asigurare\n" +
                 "/vinieta - cum de achitat vinieta\n" +
-                "/validity - verifică valabilitate unui document pentru vehiculul\n\n" +
+                "/validity - verifică valabilitate unui document pentru vehiculul\n" +
+                "/crossings – obține informația privind traversarea frontierei pentru vehiculul \n\n" +
                 "**ALTE DATE**\n" +
-                "/myData - informația personală\n" +
                 "/language - schimbă limba\n" +
-                "/community - cîți suntem noi aici\n" +
                 "/contacts - cum să ne contactați";
 
         String answerRu = "Привет! Я был создан для предоставления консультаций о правилах пересечения границы Республики Молдова!\n" +
@@ -273,27 +285,28 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "Пожалуйста выберите:\n\n" +
                 "**ЛИЦА**\n" +
                 "/citizens - правила пересечения граждан РМ\n" +
-                "/validity - проверь действительность проезного документа\n" +
+                "/validity - проверь действительность проездного документа\n" +
                 "/foreigners - правила пересечение для иностранцев\n" +
                 "/purposeDocs - документы для подтверждения цели поездки\n" +
                 "/visas - кому требуется виза для въезда в РМ\n" +
                 "/acceptedDocs - список признаваемых проездных документов для РМ\n" +
-                "/calculator - калькулятор сроков пребывания\n\n" +
+                "/calculator - калькулятор сроков пребывания\n" +
+                "/crossings – получить информацию о пересечении границы \n" +
+                "/permis – получить электронное разрешение для нахождения в пограничной зоне\n\n" +
                 "**ТРАНСПОРТ**\n" +
                 "/vehicles - правила пересечения для транспортных средств\n" +
-                "/assurance - как преобрести страховку\n" +
+                "/assurance - как приобрести страховку\n" +
                 "/vinieta - как оплатить виньетку\n" +
-                "/validity - проверь действительность своих проездных документов\n\n" +
+                "/validity - проверь действительность своих проездных документов\n" +
+                "/crossings – получить информацию о пересечении границы  транспортным средством\n\n" +
                 "**ДРУГОЕ**\n" +
-                "/myData - личная информация\n" +
                 "/language - поменять язык\n" +
-                "/community - сколько нас здесь\n" +
                 "/contacts - как с нами связаться";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
-    private void communityCommandReceived(long chatId) {
+    /*private void communityCommandReceived(long chatId) {
         long number = userRepository.count();
         String answerEng = "At that moment, our community has " + number + " participants!\n\n" +
                 "/main - back to main menu";
@@ -303,11 +316,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/main - вернуться в главное меню";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
-    }
+    }*/
 
     private void calculatorCommandReceived(long chatId){
-        String answerEng = "For calculation the period of staying of the foreign citizens in the " +
-                "Republic of Moldova you can consult the official Schengen calculator following link:\n" +
+        String answerEng = "For calculating the period of staying of the foreign citizens in the " +
+                "Republic of Moldova you can consult the official Schengen calculator following the link:\n" +
                 "https://ec.europa.eu/assets/home/visa-calculator/calculator.htm?lang=en\n\n" +
 
                 "/citizens - regulations on Republic of Moldova citizens\n" +
@@ -316,21 +329,21 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/main - back to main menu";
 
         String answerRo = "Conform prevederilor art.84 alin.(3) al Legii nr.200/2010 privind regimul străinilor în Republica Moldova, " +
-                "Străinii se pot afla pe teritoriul RM până la 90 de zile calendaristice în decursul oricărei perioade de 180 de zile " +
+                "Străinii se pot afla pe teritoriul Republicii Moldova până la 90 de zile calendaristice în decursul oricărei perioade de 180 de zile " +
                 "calendaristice, ceea ce implică luarea în considerare a ultimei perioade de 180 de zile precedente fiecărei zile de ședere.\n\n" +
                 "Pentru calcularea termenului de ședere a cetățenilor străini în Republica Moldova " +
-                "puteți folosi Calculatorul Schengen accesînd următorul link:\n" +
+                "puteți folosi Calculatorul Schengen accesând următorul link:\n" +
                 "https://ec.europa.eu/assets/home/visa-calculator/calculator.htm?lang=en\n\n" +
 
                 "/citizens - regulile de trecere a cetățenilor RM\n" +
                 "/foreigners - regulile de trecere a străinilor\n" +
                 "/vehicles - regulile de trecere a vehiculelor\n" +
-                "/back - înapoi la meniul principal";
+                "/main - înapoi la meniul principal";
 
-        String answerRu = "В соответствии с положениями ст.84 пкт.(3) Законв №200/2010 о режиме иностранцев в Республике Модова, " +
+        String answerRu = "В соответствии с положениями ст.84 пкт.(3) Закона №200/2010 о режиме иностранцев в Республике Молдова, " +
                 "Иностранцы могут находиться на территории РМ не более 90 календарных дней в течение любого периода в 180 календарных дней, " +
                 "что предполагает учет последнего 180-дневного периода, предшествующего каждому дню пребывания.\n\n" +
-                "Для подсчета сроков пребывания иностранцев на территрии РМ, можете воспользоваться " +
+                "Для подсчета сроков пребывания иностранцев на территории РМ, можете воспользоваться " +
                 "Официальным Шенгенским Калькулятором, пройдя по следующей ссылке:\n" +
                 "https://ec.europa.eu/assets/home/visa-calculator/calculator.htm?lang=en\n\n" +
 
@@ -341,7 +354,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
-
 
     private void vehiclesCommandReceived(long chatId) {
         String answerEng = "Documents that are requested from the driver during crossing the border:\n\n" +
@@ -381,7 +393,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "6) Разрешение на автомобильные перевозки людей регулярными или нерегулярными рейсами в случае транспортных операторов;\n" +
                 "7) Подтверждение оплаты виньетки на период пребывания в Республике Молдова для транспортных средств, зарегистрированных за пределами Республики Молдова, при выезде из страны.\n\n" +
 
-                "/assurance - как преобрести страховку\n" +
+                "/assurance - как приобрести страховку\n" +
                 "/vinieta - как оплатить виньетку\n" +
                 "/validity - проверь действительность своих проездных документов\n" +
                 "/main - вернуться в главное меню";
@@ -391,7 +403,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private void foreignersCommandReceived(long chatId) {
         String answerEng = "Foreigners who meet the following conditions are allowed to enter the territory of the Republic of Moldova:\n" +
-                "- possesses a valid travel document (at least 3 month valability and is issued in last 10 years period);\n" +
+                "- possesses a valid travel document (expiry date is at least 3 month after intended day of departure and is issued in last 10 years period);\n" +
                 "- has a visa;\n" +
                 "- presents documents for justifying the purpose of entry, as well as the proof of means " +
                 "for maintenance during the stay and for returning to the country of origin " +
@@ -413,7 +425,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "- posedă un document de călătorie valabil;\n" +
                 "- posedă viză;\n" +
                 "- prezintă documente care justifică scopul intrării, precum și dovada unor mijloace corespunzătoare " +
-                "atît pentru întreţinere pe perioada şederii, cît şi pentru întoarcere în ţara de origine " +
+                "atât pentru întreţinere pe perioada şederii, cât şi pentru întoarcere în ţara de origine " +
                 "sau pentru tranzit către un alt stat în care există siguranţa că li se va permite intrarea;\n" +
                 "- nu prezintă pericol pentru securitatea naţională, ordinea şi sănătatea publică\n\n" +
 
@@ -423,7 +435,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 "/purposeDocs - care sunt documente pentru justificarea scopului călătoriei\n" +
                 "/visas - cine are nevoie de o viză pentru RM\n" +
-                "/acceptedDocs - lista acctelor de călătorie acceptate pentru RM\n" +
+                "/acceptedDocs - lista actelor de călătorie acceptate pentru RM\n" +
                 "/calculator - calcularea termenului de ședere\n\n" +
                 "/vehicles - regulile de trecere a vehiculelor din străinătate\n" +
                 "/main - înapoi la meniul principal";
@@ -445,7 +457,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/acceptedDocs - список признаваемых проездных документов для РМ\n" +
                 "/calculator - калькулятор сроков пребывания\n\n" +
                 "/vehicles - правила пересечения для иностранных транспортных средств\n" +
-                "/main - вернуться обратно в основное меню";
+                "/main - вернуться в главное меню";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
@@ -476,7 +488,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "Minorii au dreptul de a ieşi şi de a intra în RM numai însoţiţi de UNUL dintre reprezentanţii lor legali " +
                 "sau de un însoţitor, desemnat prin declaraţie de către reprezentantul legal a cărui semnătură se legalizează de notar.\n\n" +
                 "Minorii (elevii şi studenţii) care au împlinit vîrsta de 14 ani şi sînt înmatriculaţi la studii " +
-                "în instituţii de învăţămînt din alte state, pot prezinta actul de înmatriculare la instituţia de învăţămînt " +
+                "în instituţii de învăţămînt din alte state, pot prezenta actul de înmatriculare la instituţia de învăţămînt " +
                 "şi declaraţia eliberată de UNUL dintre părinţi, autentificată de notar, " +
                 "care conţine consimţămîntul acestuia pentru ieşirea şi intrarea minorului în RM.\n\n" +
 
@@ -500,9 +512,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "Больше деталей можно найти в:\n" +
                 "- ст.1 Закона 269/1994: https://www.legis.md/cautare/getResults?doc_id=131615&lang=ru\n\n" +
 
-                "/validity - проверь действительность проезного документа\n" +
+                "/validity - проверь действительность проездного документа\n" +
                 "/vehicles - правила пересечения для транспортных средств из РМ\n" +
-                "/back - вернуться обратно в основное меню";
+                "/main - вернуться обратно в основное меню";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
@@ -537,7 +549,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/main - back to main menu";
 
         String answerRo = "Pentru justificarea scopului intrării străinilor în RM, " +
-                "urmează a fi prezintate următoarele documente:\n\n" +
+                "urmează a fi prezentate următoarele documente:\n\n" +
                 "a) pentru călătorii de afaceri:\n" +
                 "- o invitaţie din partea unei întreprinderi, organizaţii sau a unei instituţii;\n" +
                 "- documente ce confirmă un interes economic (de exemplu: procură, " +
@@ -559,12 +571,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 "/foreigners - regulile de trecere a străinilor\n" +
                 "/visas - cine are nevoie de o viză pentru RM\n" +
-                "/acceptedDocs - lista acctelor de călătorie acceptate pentru RM\n" +
+                "/acceptedDocs - lista actelor de călătorie acceptate pentru RM\n" +
                 "/calculator - calcularea termenului de ședere\n\n" +
                 "/vehicles - regulile de trecere a vehiculelor din străinătate\n" +
                 "/main - înapoi la meniul principal";
 
-        String answerRu = "Для обоснования цели въезда в РМ иностранцев, возможно представить следующие документы:\n\n" +
+        String answerRu = "Для обоснования цели въезда в РМ иностранцев, необходимо представить следующие документы:\n\n" +
                 " а) для деловых поездок:\n" +
                 "- приглашение со стороны предприятия, организации или учреждения;\n" +
                 "- документы, которые свидетельствуют об экономическом интересе (такие как доверенность, трудовой договор, " +
@@ -606,7 +618,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - border crossing rules for vehicles\n" +
                 "/main - back to main menu";
 
-        String answerRo = "Serviciul oficial al Ageției Servicii Publice care permite verificarea, în regim online, a statutului documentului " +
+        String answerRo = "Serviciul oficial al Agenției Servicii Publice care permite verificarea, în regim online, a statutului documentului " +
                 "în baza de date a Registrului de stat, poate fi accesat la următorul link:\n" +
                 "https://e-services.md/public/WebPublic/index.php?action=document&lang=md\n\n" +
 
@@ -627,7 +639,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
 
-
     private void visasCommandReceived(long chatId) {
         String answerEng = "List of foreigners who are required to have a visa for entry " +
                 "into the Republic of Moldova is approved according to Annex no. 1 and 3 " +
@@ -641,7 +652,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String answerRo = "Lista străinilor care au obligația deținerii unei vize la intrarea, " +
                 "ieșirea și tranzitarea teritoriului Republicii Moldova, este aprobată conform Anexei nr.1 și 3 " +
-                "la Legea nr.257/2013 și poate fi consultată accesînd următorul link: " +
+                "la Legea nr.257/2013 și poate fi consultată accesând următorul link: " +
                 "https://www.legis.md/cautare/getResults?doc_id=136362&lang=ro#\n\n" +
 
                 "/citizens - regulile de trecere a cetățenilor RM\n" +
@@ -666,7 +677,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         String answerEng = "List of travel documents that are accepted for the crossing of the border by foreigners" +
                 "is approved according to Annex no. 1 " +
                 "to Government Decision no.765/2014 and can be consulted by accessing the following link:" +
-                "https://www.legis.md/cautare/getResults?doc_id=136836&lang=ro#\n\n" +
+                " https://www.legis.md/cautare/getResults?doc_id=143523&lang=ro#\n\n" +
 
                 "/citizens - regulations on Republic of Moldova citizens\n" +
                 "/foreigners - regulations on foreign citizens\n" +
@@ -675,8 +686,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String answerRo = "Lista documentelor de călătorie acceptate pentru traversarea " +
                 "de către străini a frontierei de stat a Republicii Moldova, este aprobată " +
-                "conform Anexei nr.1 la Hotărîrea Guvernului nr.765/2014 și poate fi consultată accesînd următorul link: " +
-                "https://www.legis.md/cautare/getResults?doc_id=136836&lang=ro#\n\n" +
+                "conform Anexei nr.1 la Hotărârea Guvernului nr.765/2014 și poate fi consultată accesând următorul link: " +
+                " https://www.legis.md/cautare/getResults?doc_id=143523&lang=ro#\n\n" +
 
                 "/citizens - regulile de trecere a cetățenilor RM\n" +
                 "/foreigners - regulile de trecere a străinilor\n" +
@@ -686,7 +697,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         String answerRu = "Перечень проездных документов, необходимых иностранцам для пересечения " +
                 "государственной границы Республики Молдова утвержден Постановлением Правительства №765/2014 и " +
                 "может быть проконсультирован по следующей ссылке:\n" +
-                "https://www.legis.md/cautare/getResults?doc_id=136836&lang=ru\n\n" +
+                " https://www.legis.md/cautare/getResults?doc_id=143523&lang=ro#\n\n" +
 
                 "/citizens - правила пересечения граждан РМ\n" +
                 "/foreigners - правила пересечение для иностранцев\n" +
@@ -765,7 +776,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void defaultCommandReceived(long chatId) {
         String answerEng = "Sorry, the command is not implemented at that moment..\n" +
                 "Please choose other proposed command!\n\n" +
-                "Or white us an email on: \nfrontier.consult@yahoo.com \n" +
+                "Or white us an email on: \npolitia.frontiera@border.gov.md\n" +
                 "about your opinion / proposal / necessity we should implement!\n" +
                 "Thanks!!! Go on!!!\n\n" +
 
@@ -773,19 +784,81 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String answerRo = "Cerem scuze comanda nu este implementată la moment..\n" +
                 "Vă rog alegeți altă comandă propusă\n\n" +
-                "Sau scrieți un mesaj pe adresa electronică: \nfrontier.consult@yahoo.com\n" +
+                "Sau scrieți un mesaj pe adresa electronică: \npolitia.frontiera@border.gov.md\n" +
                 "despre opinia / propunerea / necesarul care noi trebuie să implementăm!\n" +
                 "Mulțumesc!!! Continuați!!!\n\n" +
 
                 "/main - înapoi la meniul principal";
 
         String answerRu = "Простите, данная команда не реализована на данный момент..\n" +
-                "Пожалуйста выберете другую предложенную команду!\n" +
-                "Или напишите письмо на наш email: \nfrontier.consult@yahoo.com\n" +
-                "о вашем мнении / предложении / необходимости которую мы должны реализовать!\n" +
+                "Пожалуйста, выберете другую предложенную команду!\n" +
+                "Или напишите письмо на наш email: \n politia.frontiera@border.gov.md \n" +
+                "о вашем мнении / предложении / необходимости, которую мы должны реализовать!\n" +
                 "Спасибо!!! Продолжайте!!!\n\n" +
 
+                "/main - вернуться в главное меню ";
+
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+    }
+
+    private void crossingsCommandReceived(long chatId) {
+        String answerEng = " To obtain an extract from the Integrated Information System of the Border Police regarding the crossing of the state border by the individual or transport unit " +
+                "you can use the state portal by accessing the following link:" +
+                " https://servicii.gov.md/ro/service/021001121\n\n" +
+
+                "/citizens - regulations on Republic of Moldova citizens\n" +
+                "/foreigners - regulations on foreign citizens\n" +
+                "/vehicles - border crossing rules for vehicles\n" +
                 "/main - back to main menu";
+
+        String answerRo = "Pentru a obține extras din sistemul informațional integrat al Poliției de Frontieră cu privire la traversarea frontierei de stat de către persoana fizică sau unitatea de transport " +
+                "puteți folosi portalul de stat accesînd următorul link:" +
+                " https://servicii.gov.md/ro/service/021001121\n\n" +
+
+                "/citizens - regulile de trecere a cetățenilor RM\n" +
+                "/foreigners - regulile de trecere a străinilor\n" +
+                "/vehicles - regulile de trecere a vehiculelor\n" +
+                "/main - înapoi la meniul principal";
+
+        String answerRu = "Для получения информации из Интегрированной системы Пограничной Полиции о пересечении государственной границы Республики Молдова лицом или транспортным средством " +
+                "вы можете воспользоваться государственным порталом пройдя по ссылке:\n" +
+                " https://servicii.gov.md/ru/service/021001121\n\n" +
+
+                "/citizens - правила пересечения граждан РМ\n" +
+                "/foreigners - правила пересечение для иностранцев\n" +
+                "/vehicles - правила пересечения для транспортных средств\n" +
+                "/main - вернуться в главное меню";
+
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+    }
+
+    private void permisCommandReceived(long chatId) {
+        String answerEng = " To obtain the electronic permit of access to the border area or a state border crossing point " +
+                "you can use the official Border Police portal by accessing the following link:" +
+                " https://epermis.border.gov.md/en\n\n" +
+
+                "/citizens - regulations on Republic of Moldova citizens\n" +
+                "/foreigners - regulations on foreign citizens\n" +
+                "/vehicles - border crossing rules for vehicles\n" +
+                "/main - back to main menu";
+
+        String answerRo = "Pentru a obține permisul de aflare în zonă de frontieră sau accesul temporar în punctul de trecere " +
+                "puteți folosi portalul de stat accesînd următorul link:" +
+                " https://epermis.border.gov.md/ \n\n" +
+
+                "/citizens - regulile de trecere a cetățenilor RM\n" +
+                "/foreigners - regulile de trecere a străinilor\n" +
+                "/vehicles - regulile de trecere a vehiculelor\n" +
+                "/main - înapoi la meniul principal";
+
+        String answerRu = "Для получения разрешения на доступ в приграничную зону либо на территорию пункта пропуска через государственную границу " +
+                "вы можете воспользоваться официальным порталом Пограничной Полиции пройдя по ссылке:\n" +
+                " https://epermis.border.gov.md/ru \n\n" +
+
+                "/citizens - правила пересечения граждан РМ\n" +
+                "/foreigners - правила пересечение для иностранцев\n" +
+                "/vehicles - правила пересечения для транспортных средств\n" +
+                "/main - вернуться в главное меню";
 
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }
