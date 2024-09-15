@@ -10,12 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -27,11 +34,32 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Setter
     @Getter
     private int flag;
-    @Value("${owner.chatId}")
-    private long ownerChatId;
 
     public TelegramBot(BotConfig config) {
         this.config = config;
+
+        List<BotCommand> listOfCommands = new ArrayList();
+        listOfCommands.add(new BotCommand("/citizens", "regulations on Republic of Moldova citizens"));
+        listOfCommands.add(new BotCommand("/validity", "check validity of your travel document"));
+        listOfCommands.add(new BotCommand("/foreigners", "regulations on foreign citizens"));
+        listOfCommands.add(new BotCommand("/purposeDocs", "what are purpose of entry documents"));
+        listOfCommands.add(new BotCommand("/visas", "who is requiring a visa for Republic of Moldova"));
+        listOfCommands.add(new BotCommand("/acceptedDocs", "accepted travel documents for Republic of Moldova"));
+        listOfCommands.add(new BotCommand("/calculator", "calculates period of staying"));
+        listOfCommands.add(new BotCommand("/crossings", "obtain the information about your border crossings"));
+        listOfCommands.add(new BotCommand("/permis", "obtain an electronic permit for access to border area"));
+        listOfCommands.add(new BotCommand("/vehicles", "border crossing rules for means of transport"));
+        listOfCommands.add(new BotCommand("/assurance", "how to buy an assurance"));
+        listOfCommands.add(new BotCommand("/vinieta", "how to pay a road toll"));
+        listOfCommands.add(new BotCommand("/language", "change the language"));
+        listOfCommands.add(new BotCommand("/contacts", "how to contact us"));
+
+        try{
+            this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
+        }
+        catch (TelegramApiException e) {
+            log.error("Error setting bot`s command list: " + e.getMessage());
+        }
     }
 
     @Override
@@ -123,7 +151,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     break;
 
                 case "/permis":
-                    permisCommandReceived(chatId, name, id);
+                    permisCommandReceived(chatId);
                     break;
 
                 case "/crossings":
@@ -185,7 +213,8 @@ public class TelegramBot extends TelegramLongPollingBot {
             String infoMessage = "Registered user: " + user + " from " + chat.getLocation().toString() + "!\n" +
                     "At that moment, our community has " + userRepository.count() + " participants!";
 
-            sendMessage(ownerChatId, infoMessage);
+            sendMessage(config.getOwnerId(), infoMessage);
+
             log.info("Registered user: " + user);
         }
     }
@@ -219,6 +248,88 @@ public class TelegramBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             log.error("Error occurred: " + e.getMessage());
         }
+    }
+
+    private InlineKeyboardMarkup setMarkupInline(){
+        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+        List <List<InlineKeyboardMarkup>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardMarkup> rowInline = new ArrayList<>();
+
+        var mainButton = new InlineKeyboardButton();
+        mainButton.setText("Main");
+        mainButton.setCallbackData("/main");
+
+        var languageButton = new InlineKeyboardButton();
+        languageButton.setText("Language");
+        languageButton.setCallbackData("/language");
+
+        var engButton = new InlineKeyboardButton();
+        engButton.setText("English");
+        engButton.setCallbackData("/eng");
+
+        var roButton = new InlineKeyboardButton();
+        roButton.setText("Romanian");
+        roButton.setCallbackData("/ro");
+
+        var ruButton = new InlineKeyboardButton();
+        ruButton.setText("Russian");
+        ruButton.setCallbackData("/ru");
+
+        var citizensButton = new InlineKeyboardButton();
+        citizensButton.setText("Citizens");
+        citizensButton.setCallbackData("/citizens");
+
+        var foreignersButton = new InlineKeyboardButton();
+        foreignersButton.setText("Foreigners");
+        foreignersButton.setCallbackData("/foreigners");
+
+        var purposeDocsButton = new InlineKeyboardButton();
+        purposeDocsButton.setText("Entry purpose");
+        purposeDocsButton.setCallbackData("/purposeDocs");
+
+        var validityButton = new InlineKeyboardButton();
+        validityButton.setText("Validity");
+        validityButton.setCallbackData("/validity");
+
+        var visasButton = new InlineKeyboardButton();
+        visasButton.setText("Visas");
+        visasButton.setCallbackData("/visas");
+
+        var acceptedDocsButton = new InlineKeyboardButton();
+        acceptedDocsButton.setText("Accepted Docs");
+        acceptedDocsButton.setCallbackData("/acceptedDocs");
+
+        var calculatorButton = new InlineKeyboardButton();
+        calculatorButton.setText("Calculator");
+        calculatorButton.setCallbackData("/calculator");
+
+        var vehiclesButton = new InlineKeyboardButton();
+        vehiclesButton.setText("Vehicles");
+        vehiclesButton.setCallbackData("/vehicles");
+
+        var assuranceButton = new InlineKeyboardButton();
+        assuranceButton.setText("Assurance");
+        assuranceButton.setCallbackData("/assurance");
+
+        var vinietaButton = new InlineKeyboardButton();
+        vinietaButton.setText("Vinieta");
+        vinietaButton.setCallbackData("/vinieta");
+
+        var permisButton = new InlineKeyboardButton();
+        permisButton.setText("Permis");
+        permisButton.setCallbackData("/permis");
+
+        var crossingsButton = new InlineKeyboardButton();
+        crossingsButton.setText("Crossings");
+        crossingsButton.setCallbackData("/crossings");
+
+        var contactsButton = new InlineKeyboardButton();
+        contactsButton.setText("Contacts");
+        contactsButton.setCallbackData("/contacts");
+
+
+
+        return markupInline;
     }
 
     private void startCommandReceived(long chatId, String name) {
@@ -710,9 +821,10 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void assuranceCommandReceived(long chatId) {
         String answerEng = "To purchase a green card, or an internal insurance for your vehicle, " +
                 "as well as if necessary, life and health insurance for the trips abroad " +
-                "you can use the portal of insurance companies of the Republic of Moldova " +
-                "by accessing the following link:" +
-                "https://rapidasig.md/\n\n" +
+                "you can use one of the insurance companies of the Republic of Moldova. " +
+                "Here are some examples of links you can follow:\n" +
+                "https://rapidasig.md/\n" +
+                "https://omnis.md/\n\n" +
 
                 "/citizens - regulations on Republic of Moldova citizens\n" +
                 "/foreigners - regulations on foreign citizens\n" +
@@ -721,8 +833,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String answerRo = "Pentru a achiziționa o carte verde sau o poliță de asigurare internă pentru un vehicul, " +
                 "precum și, dacă este necesar, o asigurare de viață și de sănătate pentru călătoriile în străinătate " +
-                "puteți folosi portalul companiilor de asigurări din Republica Moldova accesînd următorul link:" +
-                "https://rapidasig.md/\n\n" +
+                "puteți folosi portalul companiilor de asigurări din Republica Moldova accesînd unul dintre linkuri:\n" +
+                "https://rapidasig.md/\n" +
+                "https://omnis.md/\n\n" +
 
                 "/citizens - regulile de trecere a cetățenilor RM\n" +
                 "/foreigners - regulile de trecere a străinilor\n" +
@@ -731,8 +844,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String answerRu = "Для приобретения зеленой карты, либо внутреннего страхового полюса для вашего " +
                 "транспортного средства, а также в случае необходимости страхования жизни и здоровья для заграничных поездок " +
-                "вы можете воспользоваться порталом страховых компаний РМ пройдя по ссылке:\n" +
-                "https://rapidasig.md/ru\n\n" +
+                "вы можете воспользоваться порталом страховых компаний РМ пройдя по одной из ссылок:\n" +
+                "https://rapidasig.md/ru\n" +
+                "https://omnis.md/\n\n" +
 
                 "/citizens - правила пересечения граждан РМ\n" +
                 "/foreigners - правила пересечение для иностранцев\n" +
