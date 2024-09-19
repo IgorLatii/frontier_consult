@@ -39,26 +39,28 @@ public class TelegramBot extends TelegramLongPollingBot {
         this.config = config;
 
         List<BotCommand> listOfCommands = new ArrayList();
-        listOfCommands.add(new BotCommand("/citizens", "regulations on Republic of Moldova citizens"));
-        listOfCommands.add(new BotCommand("/validity", "check validity of your travel document"));
-        listOfCommands.add(new BotCommand("/foreigners", "regulations on foreign citizens"));
-        listOfCommands.add(new BotCommand("/purposeDocs", "what are purpose of entry documents"));
-        listOfCommands.add(new BotCommand("/visas", "who is requiring a visa for Republic of Moldova"));
-        listOfCommands.add(new BotCommand("/acceptedDocs", "accepted travel documents for Republic of Moldova"));
-        listOfCommands.add(new BotCommand("/calculator", "calculates period of staying"));
-        listOfCommands.add(new BotCommand("/crossings", "obtain the information about your border crossings"));
-        listOfCommands.add(new BotCommand("/permis", "obtain an electronic permit for access to border area"));
-        listOfCommands.add(new BotCommand("/vehicles", "border crossing rules for means of transport"));
-        listOfCommands.add(new BotCommand("/assurance", "how to buy an assurance"));
-        listOfCommands.add(new BotCommand("/vinieta", "how to pay a road toll"));
-        listOfCommands.add(new BotCommand("/language", "change the language"));
-        listOfCommands.add(new BotCommand("/contacts", "how to contact us"));
+        listOfCommands.add(new BotCommand("/citizens", "Regulations on Republic of Moldova citizens"));
+        listOfCommands.add(new BotCommand("/minors", "Regulations on minors"));
+        listOfCommands.add(new BotCommand("/validity", "Check validity of your travel document"));
+        listOfCommands.add(new BotCommand("/foreigners", "Regulations on foreign citizens"));
+        listOfCommands.add(new BotCommand("/purpose", "What are purpose of entry documents"));
+        listOfCommands.add(new BotCommand("/visas", "Who is requiring a visa for Republic of Moldova"));
+        listOfCommands.add(new BotCommand("/accepted", "Accepted travel documents for Republic of Moldova"));
+        listOfCommands.add(new BotCommand("/calculator", "Calculates period of staying"));
+        listOfCommands.add(new BotCommand("/crossings", "Obtain the information about your border crossings"));
+        listOfCommands.add(new BotCommand("/permis", "Obtain an electronic permit for access to border area"));
+        listOfCommands.add(new BotCommand("/vehicles", "Border crossing rules for means of transport"));
+        listOfCommands.add(new BotCommand("/assurance", "How to buy an assurance?"));
+        listOfCommands.add(new BotCommand("/vinieta", "How to pay a road toll (vinieta)?"));
+        listOfCommands.add(new BotCommand("/language", "Change the language"));
+        listOfCommands.add(new BotCommand("/contacts", "How to contact us"));
 
         try{
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         }
         catch (TelegramApiException e) {
             log.error("Error setting bot`s command list: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -93,21 +95,21 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 case "/eng":
                     setFlag(1);
-                    languageCommandReceived(chatId);
+                    mainCommandReceived(chatId);
                     break;
 
                 case "/ro":
                     setFlag(2);
-                    languageCommandReceived(chatId);
+                    mainCommandReceived(chatId);
                     break;
 
                 case "/ru":
                     setFlag(3);
-                    languageCommandReceived(chatId);
+                    mainCommandReceived(chatId);
                     break;
 
                 case "/main":
-                    languageCommandReceived(chatId);
+                    mainCommandReceived(chatId);
                     break;
 
                 case "/citizens":
@@ -119,6 +121,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     break;
 
                 case "/purposeDocs":
+                case "/purpose":
                     purposeDocsCommandReceived(chatId);
                     break;
 
@@ -131,6 +134,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     break;
 
                 case "/acceptedDocs":
+                case "/accepted":
                     acceptedDocsCommandReceived(chatId);
                     break;
 
@@ -158,6 +162,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                     crossingsCommandReceived(chatId);
                     break;
 
+                case "/minors":
+                    minorsCommandReceived(chatId);
+                    break;
+
                 case "/contacts":
                     contactsCommandReceived(chatId);
                     break;
@@ -165,14 +173,100 @@ public class TelegramBot extends TelegramLongPollingBot {
                 default:
                     defaultCommandReceived(chatId);
             }
+        } else if (update.hasCallbackQuery()) {
+            String callBackData = update.getCallbackQuery().getData();
+            long messageId = update.getCallbackQuery().getMessage().getMessageId();
+            long chatId = update.getCallbackQuery().getMessage().getChatId();
+            String name = update.getCallbackQuery().getMessage().getChat().getFirstName();
+
+            switch (callBackData) {
+                case "language":
+                    startCommandReceived(chatId, name);
+                    break;
+
+                case "eng":
+                    setFlag(1);
+                    mainCommandReceived(chatId);
+                    break;
+
+                case "ro":
+                    setFlag(2);
+                    mainCommandReceived(chatId);
+                    break;
+
+                case "ru":
+                    setFlag(3);
+                    mainCommandReceived(chatId);
+                    break;
+
+                case "main":
+                    mainCommandReceived(chatId);
+                    break;
+
+                case "citizens":
+                    citizensCommandReceived(chatId);
+                    break;
+
+                case "foreigners":
+                    foreignersCommandReceived(chatId);
+                    break;
+
+                case "purposeDocs":
+                    purposeDocsCommandReceived(chatId);
+                    break;
+
+                case "validity":
+                    validityCommandReceived(chatId);
+                    break;
+
+                case "visas":
+                    visasCommandReceived(chatId);
+                    break;
+
+                case "acceptedDocs":
+                    acceptedDocsCommandReceived(chatId);
+                    break;
+
+                case "calculator":
+                    calculatorCommandReceived(chatId);
+                    break;
+
+                case "vehicles":
+                    vehiclesCommandReceived(chatId);
+                    break;
+
+                case "assurance":
+                    assuranceCommandReceived(chatId);
+                    break;
+
+                case "vinieta":
+                    vinietaCommandReceived(chatId);
+                    break;
+
+                case "permis":
+                    permisCommandReceived(chatId);
+                    break;
+
+                case "crossings":
+                    crossingsCommandReceived(chatId);
+                    break;
+
+                case "minors":
+                    minorsCommandReceived(chatId);
+                    break;
+
+                case "contacts":
+                    contactsCommandReceived(chatId);
+                    break;
+            }
         }
     }
 
     private void contactsCommandReceived(long chatId) {
         String answerEng = "We are glad that you are with us!!! " +
                 "You can send any questions, clarifications, or need for additional consultations " +
-                "to our email.: \npolitia.frontiera@border.gov.md\n" +
-                "or you can contact us! Border Police Green Line: +37322259717\n” + " +
+                "to our email: \npolitia.frontiera@border.gov.md\n" +
+                "or you can contact our Border Police Green Line: +37322259717\n" +
                 "Thanks!!! Go on!!!\n\n" +
 
                 "/main - back to main menu";
@@ -192,7 +286,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 "/main - в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "contacts");
     }
 
     private void registerUser(Message msg) {
@@ -213,7 +307,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             String infoMessage = "Registered user: " + user + " from " + chat.getLocation().toString() + "!\n" +
                     "At that moment, our community has " + userRepository.count() + " participants!";
 
-            sendMessage(config.getOwnerId(), infoMessage);
+            sendMessage(config.getOwnerId(), infoMessage, "test");
 
             log.info("Registered user: " + user);
         }
@@ -238,10 +332,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
     }*/
 
-    private void sendMessage(long chatId, String textToSend) {
+    private void sendMessage(long chatId, String textToSend, String inlineMarkupOption) {
         SendMessage message = new SendMessage();
+        InlineKeyboardMarkup markupInline = setMarkupInline(inlineMarkupOption);
+
         message.setChatId(String.valueOf(chatId));
         message.setText(textToSend);
+        message.setReplyMarkup(markupInline);
 
         try {
             execute(message);
@@ -250,85 +347,202 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private InlineKeyboardMarkup setMarkupInline(){
+    private InlineKeyboardMarkup setMarkupInline(String inlineMarkupOption){
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-        List <List<InlineKeyboardMarkup>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardMarkup> rowInline = new ArrayList<>();
+        List <List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline1 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline2 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline3 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline4 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline5 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline6 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline7 = new ArrayList<>();
 
         var mainButton = new InlineKeyboardButton();
         mainButton.setText("Main");
-        mainButton.setCallbackData("/main");
+        mainButton.setCallbackData("main");
 
         var languageButton = new InlineKeyboardButton();
         languageButton.setText("Language");
-        languageButton.setCallbackData("/language");
+        languageButton.setCallbackData("language");
 
         var engButton = new InlineKeyboardButton();
         engButton.setText("English");
-        engButton.setCallbackData("/eng");
+        engButton.setCallbackData("eng");
 
         var roButton = new InlineKeyboardButton();
         roButton.setText("Romanian");
-        roButton.setCallbackData("/ro");
+        roButton.setCallbackData("ro");
 
         var ruButton = new InlineKeyboardButton();
         ruButton.setText("Russian");
-        ruButton.setCallbackData("/ru");
+        ruButton.setCallbackData("ru");
 
         var citizensButton = new InlineKeyboardButton();
         citizensButton.setText("Citizens");
-        citizensButton.setCallbackData("/citizens");
+        citizensButton.setCallbackData("citizens");
 
         var foreignersButton = new InlineKeyboardButton();
         foreignersButton.setText("Foreigners");
-        foreignersButton.setCallbackData("/foreigners");
+        foreignersButton.setCallbackData("foreigners");
 
         var purposeDocsButton = new InlineKeyboardButton();
         purposeDocsButton.setText("Entry purpose");
-        purposeDocsButton.setCallbackData("/purposeDocs");
+        purposeDocsButton.setCallbackData("purposeDocs");
 
         var validityButton = new InlineKeyboardButton();
         validityButton.setText("Validity");
-        validityButton.setCallbackData("/validity");
+        validityButton.setCallbackData("validity");
 
         var visasButton = new InlineKeyboardButton();
         visasButton.setText("Visas");
-        visasButton.setCallbackData("/visas");
+        visasButton.setCallbackData("visas");
 
         var acceptedDocsButton = new InlineKeyboardButton();
         acceptedDocsButton.setText("Accepted Docs");
-        acceptedDocsButton.setCallbackData("/acceptedDocs");
+        acceptedDocsButton.setCallbackData("acceptedDocs");
 
         var calculatorButton = new InlineKeyboardButton();
         calculatorButton.setText("Calculator");
-        calculatorButton.setCallbackData("/calculator");
+        calculatorButton.setCallbackData("calculator");
 
         var vehiclesButton = new InlineKeyboardButton();
         vehiclesButton.setText("Vehicles");
-        vehiclesButton.setCallbackData("/vehicles");
+        vehiclesButton.setCallbackData("vehicles");
 
         var assuranceButton = new InlineKeyboardButton();
         assuranceButton.setText("Assurance");
-        assuranceButton.setCallbackData("/assurance");
+        assuranceButton.setCallbackData("assurance");
 
         var vinietaButton = new InlineKeyboardButton();
         vinietaButton.setText("Vinieta");
-        vinietaButton.setCallbackData("/vinieta");
+        vinietaButton.setCallbackData("vinieta");
 
         var permisButton = new InlineKeyboardButton();
         permisButton.setText("Permis");
-        permisButton.setCallbackData("/permis");
+        permisButton.setCallbackData("permis");
 
         var crossingsButton = new InlineKeyboardButton();
         crossingsButton.setText("Crossings");
-        crossingsButton.setCallbackData("/crossings");
+        crossingsButton.setCallbackData("crossings");
 
         var contactsButton = new InlineKeyboardButton();
         contactsButton.setText("Contacts");
-        contactsButton.setCallbackData("/contacts");
+        contactsButton.setCallbackData("contacts");
 
+        var minorsButton = new InlineKeyboardButton();
+        minorsButton.setText("Minors");
+        minorsButton.setCallbackData("minors");
 
+        if (inlineMarkupOption.equals("contacts")){
+            rowInline1.add(mainButton);
+            rowsInline.add(rowInline1);
 
+        } else if (inlineMarkupOption.equals("main")) {
+            rowInline1.add(citizensButton);
+            rowInline1.add(crossingsButton);
+                        
+            rowInline2.add(minorsButton);
+            rowInline2.add(permisButton);
+                        
+            rowInline3.add(validityButton);
+            rowInline3.add(vehiclesButton);
+
+            rowInline4.add(foreignersButton);
+            rowInline4.add(assuranceButton);
+
+            rowInline5.add(visasButton);
+            rowInline5.add(vinietaButton);
+
+            rowInline6.add(acceptedDocsButton);
+            rowInline6.add(purposeDocsButton);
+
+            rowInline7.add(languageButton);
+            rowInline7.add(contactsButton);
+
+            rowsInline.add(rowInline1);
+            rowsInline.add(rowInline2);
+            rowsInline.add(rowInline3);
+            rowsInline.add(rowInline4);
+            rowsInline.add(rowInline5);
+            rowsInline.add(rowInline6);
+            rowsInline.add(rowInline7);
+
+        } else if (inlineMarkupOption.equals("vehicles")) {
+            rowInline1.add(assuranceButton);
+            rowInline1.add(vinietaButton);
+
+            rowInline2.add(validityButton);
+            rowInline2.add(crossingsButton);
+
+            rowInline3.add(mainButton);
+
+            rowsInline.add(rowInline1);
+            rowsInline.add(rowInline2);
+            rowsInline.add(rowInline3);
+
+        } else if (inlineMarkupOption.equals("foreigners")) {
+            rowInline1.add(purposeDocsButton);
+            rowInline1.add(visasButton);
+
+            rowInline2.add(acceptedDocsButton);
+            rowInline2.add(calculatorButton);
+
+            rowInline3.add(mainButton);
+
+            rowsInline.add(rowInline1);
+            rowsInline.add(rowInline2);
+            rowsInline.add(rowInline3);
+
+        } else if (inlineMarkupOption.equals("citizens")) {
+            rowInline1.add(validityButton);
+            rowInline1.add(vehiclesButton);
+
+            rowInline2.add(minorsButton);
+
+            rowInline3.add(mainButton);
+
+            rowsInline.add(rowInline1);
+            rowsInline.add(rowInline2);
+            rowsInline.add(rowInline3);
+
+        } else if (inlineMarkupOption.equals("purposeDocs")) {
+            rowInline1.add(foreignersButton);
+            rowInline1.add(visasButton);
+
+            rowInline2.add(acceptedDocsButton);
+            rowInline2.add(calculatorButton);
+
+            rowInline3.add(mainButton);
+
+            rowsInline.add(rowInline1);
+            rowsInline.add(rowInline2);
+            rowsInline.add(rowInline3);
+
+        } else if (inlineMarkupOption.equals("start") || inlineMarkupOption.equals("language")) {
+            rowInline1.add(engButton);
+            rowInline2.add(roButton);
+            rowInline3.add(ruButton);
+
+            rowsInline.add(rowInline1);
+            rowsInline.add(rowInline2);
+            rowsInline.add(rowInline3);
+
+        } else {
+            rowInline1.add(citizensButton);
+            rowInline1.add(vehiclesButton);
+
+            rowInline2.add(foreignersButton);
+            rowInline2.add(minorsButton);
+
+            rowInline3.add(mainButton);
+
+            rowsInline.add(rowInline1);
+            rowsInline.add(rowInline2);
+            rowsInline.add(rowInline3);
+        }
+
+        markupInline.setKeyboard(rowsInline);
         return markupInline;
     }
 
@@ -340,11 +554,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/ro - pentru limba română;\n" +
                 "/ru - для русского языка.";
 
-        sendMessage(chatId, answer);
+        sendMessage(chatId, answer, "start");
         log.info("Replied to user {}", name);
     }
 
-    private void languageCommandReceived(long chatId) {
+    private void mainCommandReceived(long chatId) {
         String answerEng = "So let's go!!! " +
                 "What border crossing information do you need to consult?\n\n" +
                 "You can control me by sending these commands:\n\n" +
@@ -414,7 +628,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/language - поменять язык\n" +
                 "/contacts - как с нами связаться";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "main");
     }
 
     /*private void communityCommandReceived(long chatId) {
@@ -463,7 +677,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "test");
     }
 
     private void vehiclesCommandReceived(long chatId) {
@@ -509,7 +723,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/validity - проверь действительность своих проездных документов\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "vehicles");
     }
 
     private void foreignersCommandReceived(long chatId) {
@@ -570,7 +784,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для иностранных транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "foreigners");
     }
 
     private void citizensCommandReceived(long chatId) {
@@ -578,12 +792,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "Residents of the border districts on the Moldovan-Ukrainian border have the right to leave and enter the Republic of Moldova based on their identity card " +
                 "through the crossing point within the administrative district.\n" +
                 "At the same time, for entry/exit to/from Turkey, citizens of the Republic of Moldova have the right to cross the border based on their identity card.\n\n" +
-                "Minors have the right to leave and enter the Republic of Moldova only accompanied by ONE of their legal representatives " +
-                "or by a companion, designated by declaration by the legal representative whose signature is legalized by the notary.\n\n" +
-                "Minors (pupils and students) who have reached the age of 14 and are enrolled in studies " +
-                "in educational institutions from other states, can present the document of enrollment at the educational institution " +
-                "and the declaration issued by ONE of the parents, authenticated by a notary, " +
-                "which contains his consent for the minor's exit and entry to the Republic of Moldova.\n\n" +
 
                 "More details are established in:\n" +
                 "- art.1 of Law 269/1994: https://www.legis.md/cautare/getResults?doc_id=131615&lang=ro\n\n" +
@@ -596,12 +804,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "Locuitorii raioanelor de frontieră de la frontiera moldo-ucraineană au dreptul de a ieși și intra în RM în bază buletinului de identitate " +
                 "prin punctul de trecere din raza raionului administrativ.\n" +
                 "Totodată, la intrarea/ieșirea în/din Turcia, cetățenii RM au dreptul de a traversa frontiera în bază buletinului de identitate.\n\n" +
-                "Minorii au dreptul de a ieşi şi de a intra în RM numai însoţiţi de UNUL dintre reprezentanţii lor legali " +
-                "sau de un însoţitor, desemnat prin declaraţie de către reprezentantul legal a cărui semnătură se legalizează de notar.\n\n" +
-                "Minorii (elevii şi studenţii) care au împlinit vîrsta de 14 ani şi sînt înmatriculaţi la studii " +
-                "în instituţii de învăţămînt din alte state, pot prezenta actul de înmatriculare la instituţia de învăţămînt " +
-                "şi declaraţia eliberată de UNUL dintre părinţi, autentificată de notar, " +
-                "care conţine consimţămîntul acestuia pentru ieşirea şi intrarea minorului în RM.\n\n" +
 
                 "Mai multe detalii sunt stabilite în:\n" +
                 "- art.1 al Legii 269/1994: https://www.legis.md/cautare/getResults?doc_id=131615&lang=ro\n\n" +
@@ -614,11 +816,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "Жители приграничных районов на молдо-украинской границе имеют право пересекать границу на основании внутреннего удостоверения личности " +
                 "через пункты пропуска находящиеся в административном районе\n" +
                 "В тоже время, на выезд/въезд в/из Турции, граждане РМ имеют право пересекать границу на основании внутреннего удостоверения личности.\n\n" +
-                "Несовершеннолетние лица имеют право выезжать из РМ и въезжать в РМ только в сопровождении своего законного представителя " +
-                "или сопровождающего лица, назначенного посредством декларации законным представителем, подпись которого заверяется нотариусом\n\n" +
-                "Несовершеннолетние лица (учащиеся и студенты), достигшие возраста 14 лет, зачисленные на учебу в учебные заведения других государств, " +
-                "при пересечении границы предъявляют акт о зачислении в соответствующее учебное заведение и удостоверенное нотариусом заявление одного из родителей, " +
-                "содержащее его согласие о пересечении несовершеннолетним границы\n\n" +
 
                 "Больше деталей можно найти в:\n" +
                 "- ст.1 Закона 269/1994: https://www.legis.md/cautare/getResults?doc_id=131615&lang=ru\n\n" +
@@ -627,7 +824,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств из РМ\n" +
                 "/main - вернуться обратно в основное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "citizens");
     }
 
     private void purposeDocsCommandReceived(long chatId) {
@@ -715,7 +912,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для иностранных транспортных средств\n" +
                 "/main - вернуться обратно в основное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "purposeDocs");
     }
 
     private void validityCommandReceived(long chatId) {
@@ -747,7 +944,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "test");
     }
 
     private void visasCommandReceived(long chatId) {
@@ -781,7 +978,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств из РМ\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "test");
     }
 
     private void acceptedDocsCommandReceived(long chatId) {
@@ -815,7 +1012,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "test");
     }
 
     private void assuranceCommandReceived(long chatId) {
@@ -853,7 +1050,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "test");
     }
 
     private void vinietaCommandReceived(long chatId) {
@@ -884,7 +1081,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "test");
     }
 
     private void defaultCommandReceived(long chatId) {
@@ -912,7 +1109,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 "/main - вернуться в главное меню ";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "contacts");
     }
 
     private void crossingsCommandReceived(long chatId) {
@@ -943,7 +1140,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "test");
     }
 
     private void permisCommandReceived(long chatId) {
@@ -974,16 +1171,64 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "/vehicles - правила пересечения для транспортных средств\n" +
                 "/main - вернуться в главное меню";
 
-        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng);
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "test");
     }
 
-    private void chooseAnswerLanguage(long chatId, String answerRo, String answerRu, String answerEng){
+    private void minorsCommandReceived(long chatId) {
+        String answerEng = "Minors have the right to leave and enter the Republic of Moldova only accompanied by ONE of their legal representatives " +
+                "or by a companion, designated by declaration by the legal representative whose signature is legalized by the notary.\n\n" +
+                "Minors (pupils and students) who have reached the age of 14 and are enrolled in studies " +
+                "in educational institutions from other states, can present the document of enrollment at the educational institution " +
+                "and the declaration issued by ONE of the parents, authenticated by a notary, " +
+                "which contains his consent for the minor's exit and entry to the Republic of Moldova.\n\n" +
+
+                "More details are established in:\n" +
+                "- art.1 of Law 269/1994: https://www.legis.md/cautare/getResults?doc_id=131615&lang=ro\n\n" +
+
+                "/citizens - regulations on Republic of Moldova citizens\n" +
+                "/validity - check validity of your travel document\n" +
+                "/vehicles - border crossing rules for RM vehicles\n" +
+                "/main - back to main menu";
+
+        String answerRo = "Minorii au dreptul de a ieşi şi de a intra în RM numai însoţiţi de UNUL dintre reprezentanţii lor legali " +
+                "sau de un însoţitor, desemnat prin declaraţie de către reprezentantul legal a cărui semnătură se legalizează de notar.\n\n" +
+                "Minorii (elevii şi studenţii) care au împlinit vîrsta de 14 ani şi sînt înmatriculaţi la studii " +
+                "în instituţii de învăţămînt din alte state, pot prezenta actul de înmatriculare la instituţia de învăţămînt " +
+                "şi declaraţia eliberată de UNUL dintre părinţi, autentificată de notar, " +
+                "care conţine consimţămîntul acestuia pentru ieşirea şi intrarea minorului în RM.\n\n" +
+
+                "Mai multe detalii sunt stabilite în:\n" +
+                "- art.1 al Legii 269/1994: https://www.legis.md/cautare/getResults?doc_id=131615&lang=ro\n\n" +
+
+                "/citizens - regulile de trecere a cetățenilor RM\n" +
+                "/validity - verifică valabilitate documentului de călătorie\n" +
+                "/vehicles - regulile de trecere pentru vehicule din RM\n" +
+                "/main - înapoi la meniul principal";
+
+        String answerRu = "Несовершеннолетние лица имеют право выезжать из РМ и въезжать в РМ только в сопровождении своего законного представителя " +
+                "или сопровождающего лица, назначенного посредством декларации законным представителем, подпись которого заверяется нотариусом\n\n" +
+                "Несовершеннолетние лица (учащиеся и студенты), достигшие возраста 14 лет, зачисленные на учебу в учебные заведения других государств, " +
+                "при пересечении границы предъявляют акт о зачислении в соответствующее учебное заведение и удостоверенное нотариусом заявление одного из родителей, " +
+                "содержащее его согласие о пересечении несовершеннолетним границы\n\n" +
+
+                "Больше деталей можно найти в:\n" +
+                "- ст.1 Закона 269/1994: https://www.legis.md/cautare/getResults?doc_id=131615&lang=ru\n\n" +
+
+                "/citizens - правила пересечения граждан РМ\n" +
+                "/validity - проверь действительность проездного документа\n" +
+                "/vehicles - правила пересечения для транспортных средств из РМ\n" +
+                "/main - вернуться обратно в основное меню";
+
+        chooseAnswerLanguage(chatId, answerRo, answerRu, answerEng, "test");
+    }
+
+    private void chooseAnswerLanguage(long chatId, String answerRo, String answerRu, String answerEng, String inlineMarkupOption){
         if (flag == 2) {
-            sendMessage(chatId, answerRo);
+            sendMessage(chatId, answerRo, inlineMarkupOption);
         } else if (flag == 3) {
-            sendMessage(chatId, answerRu);
+            sendMessage(chatId, answerRu, inlineMarkupOption);
         } else {
-            sendMessage(chatId, answerEng);
+            sendMessage(chatId, answerEng, inlineMarkupOption);
         }
     }
 }
