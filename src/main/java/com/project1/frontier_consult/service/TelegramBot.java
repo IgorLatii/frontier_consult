@@ -304,7 +304,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             userRepository.save(user);
 
-            String infoMessage = "Registered user: " + user + " from " + chat.getLocation().toString() + "!\n" +
+            String infoMessage = "Registered user: " + user + " from " + chat.getLocation() + "!\n\n" +
                     "At that moment, our community has " + userRepository.count() + " participants!";
 
             sendMessage(config.getOwnerId(), infoMessage, "test");

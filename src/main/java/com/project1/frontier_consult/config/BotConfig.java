@@ -1,6 +1,7 @@
 package com.project1.frontier_consult.config;
 
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -17,6 +18,7 @@ public class BotConfig {
     String token;
 
     @Value("${bot.owner}")
+    //@Getter
     Long ownerId;
 
 }
