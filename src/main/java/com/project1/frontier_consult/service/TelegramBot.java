@@ -2,8 +2,10 @@ package com.project1.frontier_consult.service;
 
 import com.project1.frontier_consult.config.BotConfig;
 import com.project1.frontier_consult.model.PredefinedResponseRepository;
+import com.project1.frontier_consult.model.PredefinedResponse;
 import com.project1.frontier_consult.model.User;
 import com.project1.frontier_consult.model.UserRepository;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -106,6 +109,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 default:
                     predefinedCommandRecieved(chatId, callBackData);
+                    System.out.println(callBackData);
             }
         }
         else if (update.hasMessage() && update.getMessage().hasText()) {
@@ -211,7 +215,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         var purposeDocsButton = new InlineKeyboardButton();
         purposeDocsButton.setText("Entry purpose");
-        purposeDocsButton.setCallbackData("purposeDocs");
+        purposeDocsButton.setCallbackData("purpose");
 
         var validityButton = new InlineKeyboardButton();
         validityButton.setText("Validity");
@@ -223,7 +227,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         var acceptedDocsButton = new InlineKeyboardButton();
         acceptedDocsButton.setText("Accepted Docs");
-        acceptedDocsButton.setCallbackData("acceptedDocs");
+        acceptedDocsButton.setCallbackData("accepted");
 
         var calculatorButton = new InlineKeyboardButton();
         calculatorButton.setText("Calculator");
@@ -329,7 +333,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             rowsInline.add(rowInline2);
             rowsInline.add(rowInline3);
 
-        } else if (inlineMarkupOption.equals("purposeDocs")) {
+        } else if (inlineMarkupOption.equals("purpose")) {
             rowInline1.add(foreignersButton);
             rowInline1.add(visasButton);
 
@@ -388,22 +392,36 @@ public class TelegramBot extends TelegramLongPollingBot {
         log.info("Replied to user {}", name);
     }
 
-    private void predefinedCommandRecieved(long chatID, String predifinedCommand) {
+    private void predefinedCommandRecieved(long chatID, String predefinedCommand) {
         String language = chooseAnswerLanguage(flag);
 
-        String answer = predefinedResponseRepository
-                .findByCommandAndLanguage(predifinedCommand, language)
-                .get()
-                .getResponseText();
+        Optional<PredefinedResponse> optionalResponse =
+                predefinedResponseRepository.findByCommandAndLanguage(predefinedCommand, language);
 
-        if (!answer.isEmpty()){
-            sendMessage(chatID, answer, predifinedCommand);
-        } else {
-            String defaultAnswer = predefinedResponseRepository
-                    .findByCommandAndLanguage("default", language)
-                    .get()
-                    .getResponseText();
+        if (optionalResponse.isPresent()) {
+            String answer = optionalResponse.get().getResponseText();
+            if (!answer.isEmpty()) {
+                sendMessage(chatID, answer, predefinedCommand);
+                return;
+            }
+        }
+        // If optionalResponse or answer are null
+        sendDefaultResponse(chatID, language);
+    }
+
+    private void sendDefaultResponse(long chatID, String language){
+
+        Optional<PredefinedResponse> optionalDefault =
+                predefinedResponseRepository.findByCommandAndLanguage("default", language);
+
+        if (optionalDefault.isPresent()) {
+            String defaultAnswer = optionalDefault.get().getResponseText();
             sendMessage(chatID, defaultAnswer, "main");
+        } else {
+            // If no default info in DB
+            String fallback = "Sorry, the information is temporarily unavailable.";
+            sendMessage(chatID, fallback, "main");
+            log.warn("Default response not found in DB. Sent fallback message.");
         }
     }
 }
