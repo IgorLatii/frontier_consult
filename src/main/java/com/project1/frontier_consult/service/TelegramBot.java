@@ -33,6 +33,8 @@ import java.util.Optional;
 public class TelegramBot extends TelegramLongPollingBot {
 
     @Autowired
+    private AiClientService aiClientService;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private PredefinedResponseRepository predefinedResponseRepository;
@@ -131,6 +133,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                     default:
                         predefinedCommandRecieved(chatId, messageText.substring(1));
                 }
+            }
+            else {
+                String answer = aiClientService.getAnswerFromFastApi(messageText);
+                sendMessage(chatId, answer, "main");
             }
         }
     }
