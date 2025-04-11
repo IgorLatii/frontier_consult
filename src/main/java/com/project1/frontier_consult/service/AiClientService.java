@@ -5,15 +5,19 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
 public class AiClientService {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     public String getAnswerFromFastApi(String question) {
-        String fastApiUrl = "http://localhost:8000/ask";
+        String fastApiUrl = "http://localhost:8001/ask";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -23,7 +27,10 @@ public class AiClientService {
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(fastApiUrl, entity, String.class);
-            return response.getBody();
+            String responseBody = response.getBody();
+
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            return jsonNode.get("answer").asText();
 
         } catch (HttpStatusCodeException ex) {
             log.error("FastAPI error ({}): {}", ex.getStatusCode(), ex.getResponseBodyAsString());
