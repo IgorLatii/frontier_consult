@@ -120,6 +120,21 @@ public class TelegramBot extends TelegramLongPollingBot {
             String name = update.getMessage().getChat().getFirstName();
 
             if (messageText.startsWith("/")) {
+                if (messageText.contains("/send") && config.getOwnerId() == chatId){
+                    String textToSend = messageText.substring(messageText.indexOf(" "));
+                    Iterable<User> users = userRepository.findAll();
+                    int count = 0;
+                    for (User user: users){
+                        sendMessage(user.getChatID(), textToSend, "main");
+                        count++;
+                    }
+
+                    String infoMessage = "Sent to " + count + " users.";
+
+                    sendMessage(config.getOwnerId(), infoMessage, "test");
+                    return;
+                }
+
                 switch (messageText) {
                     case "/start":
                         registerUser(update.getMessage());
