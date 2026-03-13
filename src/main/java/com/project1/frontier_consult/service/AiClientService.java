@@ -17,7 +17,8 @@ public class AiClientService {
 
 
     public String getAnswerFromFastApi(String question) {
-        String fastApiUrl = "http://localhost:8001/ask";
+
+        String fastApiUrl = "${fastapi.url}";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
