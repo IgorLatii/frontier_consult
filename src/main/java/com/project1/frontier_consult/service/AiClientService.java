@@ -20,6 +20,7 @@ public class AiClientService {
 
         String fastApiUrl = "${fastapi.url}";
 
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
