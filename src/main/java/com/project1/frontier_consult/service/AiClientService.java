@@ -1,6 +1,7 @@
 package com.project1.frontier_consult.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -15,12 +16,10 @@ public class AiClientService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Value("${fastapi.url}")
+    private String fastApiUrl;
 
     public String getAnswerFromFastApi(String question) {
-
-        String fastApiUrl = "${fastapi.url}";
-
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -44,4 +43,3 @@ public class AiClientService {
         }
     }
 }
-

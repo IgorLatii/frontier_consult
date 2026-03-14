@@ -16,9 +16,9 @@ ENV SPRING_PROFILES_ACTIVE=prod \
     BOT_TOKEN="" \
     BOT_OWNER="" \
     MYSQL_HOST="mysql" \
-    MYSQL_DATABASE="tg_bot" \
+    MYSQL_DATABASE="" \
     MYSQL_USER="consult" \
-    MYSQL_PASSWORD="StrongPass"
+    MYSQL_PASSWORD=""
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
