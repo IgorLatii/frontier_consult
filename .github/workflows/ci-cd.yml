@@ -1,0 +1,75 @@
+name: telegram-bot-ci-cd
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/igorlatii/telegram-bot
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show repo files
+        run: |
+          pwd
+          ls -la
+
+      - name: Placeholder tests
+        run: echo "Add real tests here"
+
+  build-and-push:
+    if: github.event_name != 'pull_request'
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        run: docker build -t $IMAGE_NAME:dev -f Dockerfile .
+
+      - name: Push image
+        run: docker push $IMAGE_NAME:dev
+
+  deploy-via-idp:
+    if: github.event_name != 'pull_request'
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger IDP release
+        run: |
+          curl -X POST "http://20.251.155.82:8000/releases" \
+            -H "accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "service": "frontier-consult",
+              "version": "'"${GITHUB_SHA}"'",
+              "environment": "dev",
+              "target": {
+                "repo": "local",
+                "ref": "'"${GITHUB_SHA}"'",
+                "composePath": "docker-compose.yml"
+              }
+            }'
